@@ -52,6 +52,7 @@ Commands:
 python3.12 src/main.py program list --day Thursday
 python3.12 src/main.py program update --block-id B012 --time-raw "3:30pm" --event-title "Updated Title"
 python3.12 src/main.py program update --block-id B012 --audience-tag "Families"
+python3.12 src/main.py program update --block-id B012 --density-tag high
 python3.12 src/main.py program remove --block-id B012
 python3.12 src/main.py program remove-by-name --event-title "Exact Title"
 ```

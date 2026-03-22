@@ -692,7 +692,8 @@ def _build_state(
         )
         row["load_density"] = load_density
         row["concurrent_events_count"] = concurrency
-        row["risk_level"] = _program_risk_level(row, concurrency, load_density)
+        explicit_risk = str(row.get("risk_level", "")).strip().lower()
+        row["risk_level"] = explicit_risk or _program_risk_level(row, concurrency, load_density)
 
     block_assignments = _load_block_assignments()
     personal_program_blocks, operational_duties = _apply_block_assignments(program_blocks, block_assignments)

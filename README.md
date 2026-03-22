@@ -231,6 +231,30 @@ python3.12 src/main.py program update \
   --audience-tag ""
 ```
 
+Override the website density tag for a block:
+
+```bash
+python3.12 src/main.py program update \
+  --block-id B010 \
+  --density-tag high
+```
+
+Use `watch` for the medium-density label:
+
+```bash
+python3.12 src/main.py program update \
+  --block-id B010 \
+  --density-tag watch
+```
+
+Clear a density tag override:
+
+```bash
+python3.12 src/main.py program update \
+  --block-id B010 \
+  --density-tag none
+```
+
 Remove a block:
 
 ```bash

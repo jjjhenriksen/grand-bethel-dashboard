@@ -127,6 +127,22 @@ def ensure_columns(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     return df.loc[:, columns]
 
 
+def normalize_density_tag(value: str) -> str:
+    normalized = str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
+    mapping = {
+        "": "",
+        "none": "",
+        "off": "",
+        "clear": "",
+        "low": "",
+        "watch": "medium",
+        "medium": "medium",
+        "high": "high",
+        "high_density": "high",
+    }
+    return mapping.get(normalized, normalized)
+
+
 def build_summary(
     responses_df: pd.DataFrame,
     attendees_df: pd.DataFrame,
@@ -302,6 +318,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     program_update_parser.add_argument("--dress-code")
     program_update_parser.add_argument("--event-type")
     program_update_parser.add_argument("--audience-tag")
+    program_update_parser.add_argument("--density-tag")
 
     program_remove_parser = program_subparsers.add_parser("remove", help="Remove a parsed program block from outputs.")
     program_remove_parser.set_defaults(route="program.remove")
@@ -973,6 +990,7 @@ def run_pipeline(input_override: Path | None) -> None:
             "dress_code",
             "event_type",
             "audience_tag",
+            "risk_level",
             "schedule_source",
         ],
     )
@@ -1575,6 +1593,8 @@ def main() -> None:
             value = getattr(args, field)
             if value is not None:
                 fields[field] = value
+        if args.density_tag is not None:
+            fields["risk_level"] = normalize_density_tag(args.density_tag)
         patches = add_patch(PROGRAM_PATCHES_PATH, {"block_id": args.block_id, "action": "update", "fields": fields})
         print(f"Saved {PROGRAM_PATCHES_PATH}")
         print(summarize_program_patches(patches))
