@@ -1,0 +1,23 @@
+competition_event_keywords:
+  variety_show:
+  - Variety Show
+  choir:
+  - Performing Arts Competition
+  performing_arts:
+  - Performing Arts Competition
+  arts_and_crafts:
+  - Turn in Arts & Crafts Competition Items
+  librarians_report: []
+  essay: []
+  ritual:
+  - Ritual Competition
+  sew_and_show:
+  - Sew and Show Turn in and Judging
+  - Sew & Show Fashion Show and Awards
+advance_submission_competitions:
+- essay
+- librarians_report
+excursion_day_aliases:
+  Wednesday on drive up: Wednesday
+  Thursday: Thursday
+  Any day of the session: Any Day

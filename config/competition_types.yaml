@@ -1,0 +1,30 @@
+variety_show:
+  interest_field: "variety_show_interest"
+  names_field: "variety_show_names"
+  detail_field: "variety_show_participant_categories"
+  is_group_competition: true
+choir:
+  interest_field: "choir_interest"
+  names_field: "choir_names"
+  is_group_competition: true
+performing_arts:
+  interest_field: "performing_arts_interest"
+  names_field: "performing_arts_participants"
+  detail_field: "performing_arts_participant_categories"
+  categories_field: "performing_arts_categories"
+arts_and_crafts:
+  interest_field: "arts_and_crafts_interest"
+  detail_field: "arts_and_crafts_participant_categories"
+  categories_field: "arts_and_crafts_categories"
+librarians_report:
+  interest_field: "librarians_report_interest"
+  names_field: "librarians_report_names"
+essay:
+  interest_field: "essay_interest"
+  names_field: "essay_names"
+ritual:
+  interest_field: "ritual_interest"
+  detail_field: "ritual_participant_categories"
+sew_and_show:
+  interest_field: "sew_and_show_interest"
+  names_field: "sew_and_show_names"

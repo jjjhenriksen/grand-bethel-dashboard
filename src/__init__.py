@@ -1,0 +1,1 @@
+"""Grand Bethel registration pipeline."""

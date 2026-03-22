@@ -1,0 +1,21 @@
+patches:
+- action: remove
+  participant_name: Megan
+  competition_type: performing-arts
+  category_raw: Vocal or instrumental ensemble (including duets)
+  response_id: ''
+- action: remove
+  participant_name: Talya
+  competition_type: performing_arts
+  category_raw: Instrumental (Any instrument, including piano)
+  response_id: R0007
+- action: add
+  participant_name: Eliana
+  competition_type: performing_arts
+  category_raw: Instrumental (Any instrument, including piano)
+  response_id: R0007
+- action: add
+  participant_name: Talya
+  competition_type: performing_arts
+  category_raw: Vocal Soloist
+  response_id: R0007

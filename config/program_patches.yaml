@@ -1,0 +1,42 @@
+patches:
+- match_event_title: Please do not leave the arena until the Grand Bethel Officers
+    have retired
+  action: remove
+- match_event_title: 2026-2027 Grand Bethel Officers Orientation
+  action: remove
+- match_event_title: (with Bethel Guardian OR member of the Executive BGC)
+  action: remove
+- block_id: B039
+  action: update
+  fields:
+    dress_code: Formal
+- match_event_title: Beehive open for drop off
+  action: remove
+- match_event_title: Volleyball Competition
+  action: remove
+- match_event_title: Officer Practice
+  action: remove
+- match_event_title: Jurisdiction Representative Installation Practice
+  action: remove
+- match_event_title: Grand Bethel Officer Installation Practice
+  action: remove
+- match_event_title: With Bethel Guardian or Exec BGC
+  action: remove
+- match_event_title: Beehive open for drop off
+  action: remove
+- match_event_title: Volleyball Competition
+  action: remove
+- match_event_title: Grand Bethel Officer Installation Practice
+  action: remove
+- match_event_title: Jurisdiction Representative Installation Practice
+  action: remove
+- match_event_title: Officer Luncheon
+  action: remove
+- match_event_title: Adventure Park Private Event
+  action: remove
+- match_event_title: Youth Summit Meeting (by invitation only)
+  action: remove
+- block_id: B001
+  action: remove
+- match_event_title: Flag Ceremony Practice
+  action: remove
