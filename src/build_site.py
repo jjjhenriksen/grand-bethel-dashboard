@@ -1190,7 +1190,7 @@ def build_site(
         "<section class='overview-grid'>"
         f"<section class='panel'><h2>Overview</h2>{_render_kv([('Families', summary['total_responses']), ('Attending families', summary['yes_attending_count']), ('Attendees', summary['total_attendees']), ('Program Blocks', summary.get('program_block_count', 0))])}</section>"
         f"<section class='panel'><h2>Competition Planning</h2>{_render_kv([('Scheduled', int((competition_event_rosters_df['schedule_status'] == 'scheduled').sum()) if not competition_event_rosters_df.empty else 0), ('Advance submitted', int((competition_event_rosters_df['schedule_status'] == 'submitted_in_advance').sum()) if not competition_event_rosters_df.empty else 0), ('Needs mapping', int((competition_event_rosters_df['schedule_status'] == 'unscheduled_in_program').sum()) if not competition_event_rosters_df.empty else 0)])}</section>"
-        f"<section class='panel'><h2>Quick Links</h2><ul class='action-list'><li><a href='operations.html'>Operations center</a></li><li><a href='program.html'>Session program</a></li><li><a href='competitions.html'>Competition planning</a></li><li><a href='families.html'>Families</a></li><li><a href='../dashboard.html'>Single-page dashboard</a></li></ul></section>"
+        f"<section class='panel'><h2>Quick Links</h2><ul class='action-list'><li><a href='operations.html'>Operations center</a></li><li><a href='program.html'>Session program</a></li><li><a href='competitions.html'>Competition planning</a></li><li><a href='families.html'>Families</a></li></ul></section>"
         "</section>"
         f"<section class='panel'><h2>Participant Conflicts</h2>{_render_conflict_cards(conflict_preview)}</section>"
     )

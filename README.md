@@ -523,7 +523,6 @@ The pipeline writes all derived files to `outputs/`:
 - `participant_conflicts.csv`: possible same-time participant overlaps based on scheduled competition blocks.
 - `daily_program_summary.csv`: per-day planning summary combining the preliminary program and registration interest.
 - `summary.json`: machine-readable totals for downstream use.
-- `dashboard.html`: static operational dashboard.
 - `site/index.html`: website home page that keeps the current dashboard feel while splitting operations, program, competitions, and families into separate pages.
 - `site/operations.html`: action-oriented operations page with immediate actions, assignments, conflicts, and validation queue.
 - `site/program.html`: session program page.

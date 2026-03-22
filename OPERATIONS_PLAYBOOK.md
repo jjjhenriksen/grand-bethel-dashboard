@@ -33,7 +33,6 @@ Expected effects:
 
 - all CSV outputs are rewritten
 - `summary.json` is rewritten
-- `dashboard.html` is regenerated
 - `outputs/site/*.html` is regenerated
 
 ## 3. Operational Change Surfaces

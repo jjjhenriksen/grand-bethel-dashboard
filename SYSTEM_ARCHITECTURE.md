@@ -5,7 +5,6 @@
 This system ingests a single Grand Bethel registration CSV export plus static configuration, derives normalized operational datasets, and emits:
 
 - CSV outputs in `outputs`
-- `dashboard.html` as a single-page dashboard
 - a static multi-page site in `outputs/site`
 - CLI-managed patch and override files in `config`
 
@@ -122,7 +121,6 @@ Responsibilities:
 
 - write canonical CSV outputs
 - generate `summary.json`
-- generate the single-page dashboard
 - generate the multi-page static site
 
 ## Runtime Data Flow
@@ -203,7 +201,6 @@ Written by `write_outputs(...)`:
 
 ### Presentation outputs
 
-- `outputs/dashboard.html`
 - `outputs/site/index.html`
 - `outputs/site/operations.html`
 - `outputs/site/program.html`
