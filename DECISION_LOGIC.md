@@ -10,7 +10,7 @@ This document defines the explicit rules used to transform raw registration inpu
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/load_raw.py`
+- `src/load_raw.py`
 
 Rules:
 
@@ -28,7 +28,7 @@ Failure mode:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/normalize_responses.py`
+- `src/normalize_responses.py`
 
 Rules for `normalize_bool(...)`:
 
@@ -68,7 +68,7 @@ Consequence:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/parse_family_attendance.py`
+- `src/parse_family_attendance.py`
 
 ### Primary parse strategy
 
@@ -106,7 +106,7 @@ If no structured pairs are found:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/parse_competitions.py`
+- `src/parse_competitions.py`
 
 ### Source configuration
 
@@ -141,7 +141,7 @@ For each configured competition type:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/parse_meals.py`
+- `src/parse_meals.py`
 
 ### Parse order
 
@@ -171,7 +171,7 @@ Module:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/parse_program.py`
+- `src/parse_program.py`
 
 ### Source format assumptions
 
@@ -211,7 +211,7 @@ For each parseable event row:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/program_patches.py`
+- `src/program_patches.py`
 
 Matching:
 
@@ -228,7 +228,7 @@ Actions:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/bethel_overrides.py`
+- `src/bethel_overrides.py`
 
 Rule:
 
@@ -239,7 +239,7 @@ Rule:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/competition_patches.py`
+- `src/competition_patches.py`
 
 Matching rules for removal:
 
@@ -255,7 +255,7 @@ Addition rules:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/attendee_patches.py`
+- `src/attendee_patches.py`
 
 Rules:
 
@@ -268,7 +268,7 @@ Rules:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/excursion_patches.py`
+- `src/excursion_patches.py`
 
 Rules:
 
@@ -281,7 +281,7 @@ Rules:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/enrich_schedule.py`
+- `src/enrich_schedule.py`
 
 ### Participant grouping for manual overrides
 
@@ -330,7 +330,7 @@ Competitions listed in `schedule_map.yaml: advance_submission_competitions` are 
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/enrich_schedule.py`
+- `src/enrich_schedule.py`
 
 Resolution:
 
@@ -348,7 +348,7 @@ Day/date mapping:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/validate.py`
+- `src/validate.py`
 
 ### Response-level validation
 
@@ -370,8 +370,8 @@ The system emits `duplicate_attendee_name_across_rows` when the same normalized 
 
 Source:
 
-- `build_participant_conflicts(...)` from `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/enrich_schedule.py`
-- site-level conflict enrichment in `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/build_site.py`
+- `build_participant_conflicts(...)` from `src/enrich_schedule.py`
+- site-level conflict enrichment in `src/build_site.py`
 
 Current site-level rules:
 
@@ -385,7 +385,7 @@ Current site-level rules:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/build_site.py`
+- `src/build_site.py`
 
 ### Context derivation
 
@@ -427,7 +427,7 @@ Deadline rules:
 
 Module:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/build_site.py`
+- `src/build_site.py`
 
 ### Assignment urgency
 

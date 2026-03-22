@@ -4,10 +4,10 @@
 
 This system ingests a single Grand Bethel registration CSV export plus static configuration, derives normalized operational datasets, and emits:
 
-- CSV outputs in `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs`
+- CSV outputs in `outputs`
 - `dashboard.html` as a single-page dashboard
-- a static multi-page site in `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/site`
-- CLI-managed patch and override files in `/Users/jacquelinehenriksen/grand-bethel-pipeline/config`
+- a static multi-page site in `outputs/site`
+- CLI-managed patch and override files in `config`
 
 The runtime model is file-based and stateless between runs except for persisted YAML patch/override files.
 
@@ -15,7 +15,7 @@ The runtime model is file-based and stateless between runs except for persisted 
 
 ### 1. Entry point
 
-File: `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py`
+File: `src/main.py`
 
 Responsibilities:
 
@@ -36,8 +36,8 @@ Primary callable:
 
 Files:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/load_raw.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/normalize_responses.py`
+- `src/load_raw.py`
+- `src/normalize_responses.py`
 
 Responsibilities:
 
@@ -50,12 +50,12 @@ Responsibilities:
 
 Files:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/parse_family_attendance.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/parse_competitions.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/parse_excursions.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/parse_meals.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/parse_program.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/derive_rooming.py`
+- `src/parse_family_attendance.py`
+- `src/parse_competitions.py`
+- `src/parse_excursions.py`
+- `src/parse_meals.py`
+- `src/parse_program.py`
+- `src/derive_rooming.py`
 
 Responsibilities:
 
@@ -70,7 +70,7 @@ Responsibilities:
 
 File:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/validate.py`
+- `src/validate.py`
 
 Responsibilities:
 
@@ -81,7 +81,7 @@ Responsibilities:
 
 File:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/enrich_schedule.py`
+- `src/enrich_schedule.py`
 
 Responsibilities:
 
@@ -95,12 +95,12 @@ Responsibilities:
 
 Files:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/program_patches.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/bethel_overrides.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/competition_patches.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/attendee_patches.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/excursion_patches.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/schedule_config.py`
+- `src/program_patches.py`
+- `src/bethel_overrides.py`
+- `src/competition_patches.py`
+- `src/attendee_patches.py`
+- `src/excursion_patches.py`
+- `src/schedule_config.py`
 
 Responsibilities:
 
@@ -114,9 +114,9 @@ Responsibilities:
 
 Files:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/write_outputs.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/build_dashboard.py`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/build_site.py`
+- `src/write_outputs.py`
+- `src/build_dashboard.py`
+- `src/build_site.py`
 
 Responsibilities:
 
@@ -165,21 +165,21 @@ Responsibilities:
 
 ### Raw source inputs
 
-- one CSV file in `/Users/jacquelinehenriksen/grand-bethel-pipeline/data/raw`
+- one CSV file in `data/raw`
 - state program markdown:
-  `/Users/jacquelinehenriksen/grand-bethel-pipeline/data/raw/2026 GB Prelim Program.md`
+  `data/raw/2026 GB Prelim Program.md`
 
 ### Config and operator-controlled inputs
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/field_map.yaml`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/meal_codes.yaml`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/competition_types.yaml`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/schedule_map.yaml`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/program_patches.yaml`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/bethel_overrides.yaml`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/competition_patches.yaml`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/attendee_patches.yaml`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/excursion_patches.yaml`
+- `config/field_map.yaml`
+- `config/meal_codes.yaml`
+- `config/competition_types.yaml`
+- `config/schedule_map.yaml`
+- `config/program_patches.yaml`
+- `config/bethel_overrides.yaml`
+- `config/competition_patches.yaml`
+- `config/attendee_patches.yaml`
+- `config/excursion_patches.yaml`
 
 ## Output Surfaces
 
@@ -203,18 +203,18 @@ Written by `write_outputs(...)`:
 
 ### Presentation outputs
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/dashboard.html`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/site/index.html`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/site/operations.html`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/site/program.html`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/site/competitions.html`
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/site/families.html`
+- `outputs/dashboard.html`
+- `outputs/site/index.html`
+- `outputs/site/operations.html`
+- `outputs/site/program.html`
+- `outputs/site/competitions.html`
+- `outputs/site/families.html`
 
 ## Shared State and Site Rendering
 
 File:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/build_site.py`
+- `src/build_site.py`
 
 The multi-page site uses an in-memory canonical `STATE` object:
 
@@ -281,7 +281,7 @@ Resolution precedence in `map_excursions_to_days(...)`:
 
 ## CLI Architecture
 
-All CLI commands are implemented in `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py`.
+All CLI commands are implemented in `src/main.py`.
 
 Primary command groups:
 

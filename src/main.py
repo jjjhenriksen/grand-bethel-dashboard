@@ -301,6 +301,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     program_update_parser.add_argument("--event-title")
     program_update_parser.add_argument("--dress-code")
     program_update_parser.add_argument("--event-type")
+    program_update_parser.add_argument("--audience-tag")
 
     program_remove_parser = program_subparsers.add_parser("remove", help="Remove a parsed program block from outputs.")
     program_remove_parser.set_defaults(route="program.remove")
@@ -971,6 +972,7 @@ def run_pipeline(input_override: Path | None) -> None:
             "event_title",
             "dress_code",
             "event_type",
+            "audience_tag",
             "schedule_source",
         ],
     )
@@ -1569,7 +1571,7 @@ def main() -> None:
 
     if route == "program.update":
         fields = {}
-        for field in ["day_label", "event_date", "time_raw", "event_title", "dress_code", "event_type"]:
+        for field in ["day_label", "event_date", "time_raw", "event_title", "dress_code", "event_type", "audience_tag"]:
             value = getattr(args, field)
             if value is not None:
                 fields[field] = value

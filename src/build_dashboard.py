@@ -434,6 +434,9 @@ def _dress_code_display(value: object) -> str:
 
 
 def _program_audience_tag(row: dict[str, object]) -> str:
+    explicit = str(row.get("audience_tag", "") or "").strip()
+    if explicit:
+        return explicit
     title = str(row.get("event_title", "") or "").strip().lower()
     event_type = str(row.get("event_type", "") or "").strip().lower()
     if not title and not event_type:
@@ -470,6 +473,7 @@ def _render_program_table(program_blocks_df: pd.DataFrame) -> str:
         "dress_code",
         "schedule_source",
         "event_type",
+        "audience_tag",
         "override_assignment",
         "assigned_people",
         "replaced_event_titles",

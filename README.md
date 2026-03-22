@@ -1,6 +1,15 @@
 # Grand Bethel Registration Pipeline
 
-Deterministic Python pipeline for turning a raw Google Forms CSV export into planning outputs for the 2026 Grand Bethel Registration Survey.
+Deterministic Python pipeline for turning a registration export and preliminary session schedule into planning outputs, CSV summaries, and a static website.
+
+## Repository Notes
+
+This repository is suitable for public source code hosting, but the underlying registration exports and generated outputs may contain personal or operationally sensitive information.
+
+- Do not commit real registration exports unless you intend that data to be public.
+- Prefer sanitized sample data when sharing the repository outside the operating team.
+- Review generated files in `outputs/` before publishing them, especially if they include names, contact details, schedules, or rooming information.
+- Treat `data/raw/` as input workspace, not as a safe archive for long-term sensitive data storage.
 
 ## Run
 
@@ -12,7 +21,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2. Put the raw Google Forms CSV export into `data/raw/`.
+2. Put the raw registration CSV export into `data/raw/`.
 
 3. Run the pipeline:
 
@@ -23,7 +32,7 @@ python3.12 src/main.py run
 Or point directly at a file:
 
 ```bash
-python3.12 src/main.py run --input /absolute/path/to/export.csv
+python3.12 src/main.py run --input /path/to/export.csv
 ```
 
 If you omit the subcommand, the CLI still defaults to running the pipeline.
@@ -51,6 +60,8 @@ To use it:
 4. Push changes to `main` or run the workflow manually from the Actions tab.
 
 The workflow installs dependencies, runs `python src/main.py run`, and deploys the generated site from `outputs/site/`.
+
+If you use GitHub Pages for a public site, make sure the input data and generated pages are appropriate for public release before pushing to `main`.
 
 ## Bethel Override CLI
 
@@ -202,6 +213,22 @@ python3.12 src/main.py program update \
   --block-id B010 \
   --time-raw 8:00am \
   --event-title "Beehive open for drop off"
+```
+
+Override the website audience tag for a block:
+
+```bash
+python3.12 src/main.py program update \
+  --block-id B010 \
+  --audience-tag "Families"
+```
+
+Clear an audience tag override and go back to automatic inference:
+
+```bash
+python3.12 src/main.py program update \
+  --block-id B010 \
+  --audience-tag ""
 ```
 
 Remove a block:

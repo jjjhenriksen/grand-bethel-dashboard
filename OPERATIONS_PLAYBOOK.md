@@ -2,15 +2,16 @@
 
 ## Purpose
 
-This playbook defines the safe operational workflow for maintaining the Grand Bethel pipeline and static site without editing derived artifacts manually.
+This playbook defines the safe operational workflow for maintaining the pipeline and static site without editing derived artifacts manually.
 
 ## 1. Operating Rules
 
-- Never edit files in `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs` by hand.
+- Never edit files in `outputs/` by hand.
 - Make changes through source data, config, or YAML patch files.
 - After any patch/config change, rerun the pipeline.
 - Treat `response_id` as stable only relative to the current raw CSV row order.
 - If the raw CSV changes row order, revalidate every response-specific patch.
+- Assume raw exports and derived outputs may contain sensitive information.
 
 ## 2. Standard Run Procedure
 
@@ -19,13 +20,13 @@ This playbook defines the safe operational workflow for maintaining the Grand Be
 Command:
 
 ```bash
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py run
+python3.12 src/main.py run
 ```
 
 Alternate:
 
 ```bash
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py run --input /absolute/path/to/export.csv
+python3.12 src/main.py run --input /path/to/export.csv
 ```
 
 Expected effects:
@@ -33,7 +34,7 @@ Expected effects:
 - all CSV outputs are rewritten
 - `summary.json` is rewritten
 - `dashboard.html` is regenerated
-- `/outputs/site/*.html` is regenerated
+- `outputs/site/*.html` is regenerated
 
 ## 3. Operational Change Surfaces
 
@@ -48,15 +49,16 @@ Use when:
 Commands:
 
 ```bash
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py program list --day Thursday
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py program update --block-id B012 --time-raw "3:30pm" --event-title "Updated Title"
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py program remove --block-id B012
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py program remove-by-name --event-title "Exact Title"
+python3.12 src/main.py program list --day Thursday
+python3.12 src/main.py program update --block-id B012 --time-raw "3:30pm" --event-title "Updated Title"
+python3.12 src/main.py program update --block-id B012 --audience-tag "Families"
+python3.12 src/main.py program remove --block-id B012
+python3.12 src/main.py program remove-by-name --event-title "Exact Title"
 ```
 
 Storage:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/program_patches.yaml`
+- `config/program_patches.yaml`
 
 ### B. Add Bethel-local blocks
 
@@ -67,12 +69,12 @@ Use when:
 Command:
 
 ```bash
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py override add-block --day-label Thursday --event-date 2026-06-18 --time-raw "5:00pm" --event-title "Bethel 337 Dinner" --dress-code "Casual" --event-type bethel_local
+python3.12 src/main.py override add-block --day-label Thursday --event-date 2026-06-18 --time-raw "5:00pm" --event-title "Bethel 337 Dinner" --dress-code "Casual" --event-type bethel_local
 ```
 
 Storage:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/bethel_overrides.yaml`
+- `config/bethel_overrides.yaml`
 
 ### C. Add or remove attendees
 
@@ -83,13 +85,13 @@ Use when:
 Commands:
 
 ```bash
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py attendee add --response-id R0003 --attendee-name "Jane Doe" --attendee-type daughter --attendee-age-raw "15"
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py attendee remove --response-id R0003 --attendee-name "Jane Doe"
+python3.12 src/main.py attendee add --response-id R0003 --attendee-name "Jane Doe" --attendee-type daughter --attendee-age-raw "15"
+python3.12 src/main.py attendee remove --response-id R0003 --attendee-name "Jane Doe"
 ```
 
 Storage:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/attendee_patches.yaml`
+- `config/attendee_patches.yaml`
 
 Operational note:
 
@@ -105,13 +107,13 @@ Use when:
 Commands:
 
 ```bash
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py competition add --response-id R0003 --participant-name Lucia --competition-type librarians_report
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py competition remove --response-id R0003 --participant-name Lucia --competition-type librarians_report
+python3.12 src/main.py competition add --response-id R0003 --participant-name Lucia --competition-type librarians_report
+python3.12 src/main.py competition remove --response-id R0003 --participant-name Lucia --competition-type librarians_report
 ```
 
 Storage:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/competition_patches.yaml`
+- `config/competition_patches.yaml`
 
 ### E. Configure competition timing behavior
 
@@ -123,15 +125,15 @@ Use when:
 Commands:
 
 ```bash
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py competition show-timing
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py competition set-timing --competition-type ritual --event-title "Ritual Competition"
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py competition add-advance-submission --competition-type essay
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py competition remove-advance-submission --competition-type essay
+python3.12 src/main.py competition show-timing
+python3.12 src/main.py competition set-timing --competition-type ritual --event-title "Ritual Competition"
+python3.12 src/main.py competition add-advance-submission --competition-type essay
+python3.12 src/main.py competition remove-advance-submission --competition-type essay
 ```
 
 Storage:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/schedule_map.yaml`
+- `config/schedule_map.yaml`
 
 ### F. Force a specific competition schedule slot
 
@@ -143,13 +145,13 @@ Use when:
 Commands:
 
 ```bash
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py competition set-time-override --competition-type performing_arts --participant-group ensemble --day-label Friday --event-date 2026-06-19 --time-raw "3:30pm" --event-title "Performing Arts Competition"
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py competition schedule-entry --response-id R0003 --participant-name Lucia --competition-type librarians_report --day-label Friday --event-date 2026-06-19 --time-raw "3:30pm" --event-title "Special Slot"
+python3.12 src/main.py competition set-time-override --competition-type performing_arts --participant-group ensemble --day-label Friday --event-date 2026-06-19 --time-raw "3:30pm" --event-title "Performing Arts Competition"
+python3.12 src/main.py competition schedule-entry --response-id R0003 --participant-name Lucia --competition-type librarians_report --day-label Friday --event-date 2026-06-19 --time-raw "3:30pm" --event-title "Special Slot"
 ```
 
 Storage:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/bethel_overrides.yaml`
+- `config/bethel_overrides.yaml`
 
 ### G. Accept or deny excursions session-wide
 
@@ -160,26 +162,26 @@ Use when:
 Commands:
 
 ```bash
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py excursion list
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py excursion accept --excursion-name "Sequoia National Park (Thursday)"
-python3.12 /Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py excursion deny --excursion-name "Sequoia Springs water park (Thursday)"
+python3.12 src/main.py excursion list
+python3.12 src/main.py excursion accept --excursion-name "Sequoia National Park (Thursday)"
+python3.12 src/main.py excursion deny --excursion-name "Sequoia Springs water park (Thursday)"
 ```
 
 Storage:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/excursion_patches.yaml`
+- `config/excursion_patches.yaml`
 
 ## 4. Regeneration Checklist After Any Change
 
 1. Apply the CLI change.
 2. Run the pipeline.
 3. Inspect these outputs:
-   - `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/summary.json`
-   - `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/program_blocks.csv`
-   - `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/competition_event_rosters.csv`
-   - `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/participant_conflicts.csv`
-   - `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/site/index.html`
-   - `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/site/operations.html`
+   - `outputs/summary.json`
+   - `outputs/program_blocks.csv`
+   - `outputs/competition_event_rosters.csv`
+   - `outputs/participant_conflicts.csv`
+   - `outputs/site/index.html`
+   - `outputs/site/operations.html`
 4. Confirm that the intended entity moved into the correct schedule/status bucket.
 
 ## 5. Troubleshooting Guide
@@ -193,7 +195,7 @@ Likely cause:
 Action:
 
 1. inspect the new export headers
-2. update `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/field_map.yaml`
+2. update `config/field_map.yaml`
 3. rerun
 
 ### Problem: a participant appears unscheduled
@@ -223,8 +225,8 @@ Likely causes:
 
 Actions:
 
-1. inspect `/Users/jacquelinehenriksen/grand-bethel-pipeline/outputs/competition_event_rosters.csv`
-2. inspect `/Users/jacquelinehenriksen/grand-bethel-pipeline/config/bethel_overrides.yaml`
+1. inspect `outputs/competition_event_rosters.csv`
+2. inspect `config/bethel_overrides.yaml`
 3. tighten time overrides by `response_id` and participant name where possible
 
 ### Problem: family counts or meal rows are off
@@ -272,7 +274,7 @@ Priority interpretation:
 ## 7. Safe Editing Rules for Developers
 
 - Edit source modules in `src/`; do not hand-edit generated HTML.
-- Preserve the entrypoint `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/main.py`.
+- Preserve the entrypoint `src/main.py`.
 - Preserve `write_outputs(...)` as the single output orchestration path unless a deliberate architecture change is approved.
 - If changing schema, update all of:
   - DataFrame construction in `main.py`
@@ -298,7 +300,7 @@ Before sharing outputs:
 
 If patch state becomes untrustworthy:
 
-1. back up all YAML files in `/Users/jacquelinehenriksen/grand-bethel-pipeline/config`
+1. back up all YAML files in `config`
 2. inspect with:
    - `program show-patches`
    - `competition show-patches`

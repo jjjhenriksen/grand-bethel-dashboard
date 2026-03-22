@@ -13,7 +13,7 @@
 
 Produced by:
 
-- `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/normalize_responses.py`
+- `src/normalize_responses.py`
 
 Key fields:
 
@@ -411,7 +411,7 @@ excursion_day_aliases:
 
 ## Site-Only Derived State
 
-Generated in `/Users/jacquelinehenriksen/grand-bethel-pipeline/src/build_site.py`.
+Generated in `src/build_site.py`.
 
 ### `STATE`
 
