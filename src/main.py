@@ -511,6 +511,42 @@ def build_arg_parser() -> argparse.ArgumentParser:
     assignment_assign_parser.add_argument("--urgency", default="")
     assignment_assign_parser.add_argument("--notes", default="")
 
+    assignment_clear_owner_parser = assignment_subparsers.add_parser(
+        "clear-owner",
+        help="Remove one person from all assignment owner fields where they currently appear.",
+    )
+    assignment_clear_owner_parser.set_defaults(route="assignment.clear_owner")
+    assignment_clear_owner_parser.add_argument("--owner", required=True)
+    assignment_clear_owner_parser.add_argument(
+        "--include-backup-owner",
+        action="store_true",
+        help="Also clear matching backup owner fields.",
+    )
+
+    assignment_transfer_owner_parser = assignment_subparsers.add_parser(
+        "transfer-owner",
+        help="Move all assignment owner fields from one person to another.",
+    )
+    assignment_transfer_owner_parser.set_defaults(route="assignment.transfer_owner")
+    assignment_transfer_owner_parser.add_argument("--from", dest="from_owner", required=True)
+    assignment_transfer_owner_parser.add_argument("--to", dest="to_owner", required=True)
+    assignment_transfer_owner_parser.add_argument(
+        "--include-backup-owner",
+        action="store_true",
+        help="Also move matching backup owner fields.",
+    )
+
+    assignment_clear_all_owners_parser = assignment_subparsers.add_parser(
+        "clear-all-owners",
+        help="Clear all assignment owners across all assignments.",
+    )
+    assignment_clear_all_owners_parser.set_defaults(route="assignment.clear_all_owners")
+    assignment_clear_all_owners_parser.add_argument(
+        "--include-backup-owner",
+        action="store_true",
+        help="Also clear all backup owner fields.",
+    )
+
     assignment_show_parser = assignment_subparsers.add_parser("show-patches", help="Print the current assignment patch file.")
     assignment_show_parser.set_defaults(route="assignment.show_patches")
     assignment_reset_parser = assignment_subparsers.add_parser("reset-patches", help="Reset assignment patches back to an empty template.")
@@ -1382,17 +1418,73 @@ def main() -> None:
         return
 
     if route == "assignment.assign":
+        patch = {
+            "action": "assign",
+            "assignment_id": args.assignment_id,
+        }
+        if args.owner != "":
+            patch["owner"] = args.owner
+        if args.backup_owner != "":
+            patch["backup_owner"] = args.backup_owner
+        if args.status != "":
+            patch["status"] = args.status
+        if args.urgency != "":
+            patch["urgency"] = args.urgency
+        if args.notes != "":
+            patch["notes"] = args.notes
         patches = add_assignment_patch(
             ASSIGNMENT_PATCHES_PATH,
-            {
-                "action": "assign",
-                "assignment_id": args.assignment_id,
-                "owner": args.owner,
-                "backup_owner": args.backup_owner,
-                "status": args.status,
-                "urgency": args.urgency,
-                "notes": args.notes,
-            },
+            patch,
+        )
+        print(f"Saved {ASSIGNMENT_PATCHES_PATH}")
+        print(summarize_assignment_patches(patches))
+        print("Run `grand-bethel run` to regenerate outputs.")
+        return
+
+    if route == "assignment.clear_owner":
+        patch = {
+            "action": "bulk_assign",
+            "match_owner": args.owner,
+            "owner": "",
+        }
+        if args.include_backup_owner:
+            patch["backup_owner"] = ""
+        patches = add_assignment_patch(
+            ASSIGNMENT_PATCHES_PATH,
+            patch,
+        )
+        print(f"Saved {ASSIGNMENT_PATCHES_PATH}")
+        print(summarize_assignment_patches(patches))
+        print("Run `grand-bethel run` to regenerate outputs.")
+        return
+
+    if route == "assignment.transfer_owner":
+        patch = {
+            "action": "bulk_assign",
+            "match_owner": args.from_owner,
+            "owner": args.to_owner,
+        }
+        if args.include_backup_owner:
+            patch["backup_owner"] = args.to_owner
+        patches = add_assignment_patch(
+            ASSIGNMENT_PATCHES_PATH,
+            patch,
+        )
+        print(f"Saved {ASSIGNMENT_PATCHES_PATH}")
+        print(summarize_assignment_patches(patches))
+        print("Run `grand-bethel run` to regenerate outputs.")
+        return
+
+    if route == "assignment.clear_all_owners":
+        patch = {
+            "action": "clear_all_owners",
+            "owner": "",
+        }
+        if args.include_backup_owner:
+            patch["backup_owner"] = ""
+        patches = add_assignment_patch(
+            ASSIGNMENT_PATCHES_PATH,
+            patch,
         )
         print(f"Saved {ASSIGNMENT_PATCHES_PATH}")
         print(summarize_assignment_patches(patches))

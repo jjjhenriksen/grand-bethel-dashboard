@@ -118,10 +118,32 @@ def apply_assignment_patches(rows: list[dict[str, Any]], patch_config: dict[str,
                 if str(row.get("assignment_id", "")).strip() != assignment_id:
                     continue
                 for field in ["owner", "backup_owner", "status", "urgency", "notes"]:
-                    value = patch.get(field, None)
-                    if value is not None and str(value) != "":
-                        row[field] = value
+                    if field in patch:
+                        value = patch.get(field, None)
+                        if value is not None:
+                            row[field] = value
                 break
+            continue
+        if action == "bulk_assign":
+            match_owner = str(patch.get("match_owner", "")).strip().lower()
+            replacement_owner = patch.get("owner", None)
+            replacement_backup_owner = patch.get("backup_owner", None)
+            if not match_owner:
+                continue
+            for row in patched:
+                if str(row.get("owner", "")).strip().lower() == match_owner and replacement_owner is not None:
+                    row["owner"] = replacement_owner
+                if str(row.get("backup_owner", "")).strip().lower() == match_owner and replacement_backup_owner is not None:
+                    row["backup_owner"] = replacement_backup_owner
+            continue
+        if action == "clear_all_owners":
+            replacement_owner = patch.get("owner", None)
+            replacement_backup_owner = patch.get("backup_owner", None)
+            for row in patched:
+                if replacement_owner is not None:
+                    row["owner"] = replacement_owner
+                if replacement_backup_owner is not None:
+                    row["backup_owner"] = replacement_backup_owner
             continue
         if action == "add":
             candidate = {

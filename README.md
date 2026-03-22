@@ -319,6 +319,51 @@ python3.12 src/main.py assignment assign \
   --status in_progress
 ```
 
+Clear one person from all primary assignment owner slots:
+
+```bash
+python3.12 src/main.py assignment clear-owner \
+  --owner "Jane Doe"
+```
+
+Also clear them from backup owner slots:
+
+```bash
+python3.12 src/main.py assignment clear-owner \
+  --owner "Jane Doe" \
+  --include-backup-owner
+```
+
+Transfer all assignments from one person to another:
+
+```bash
+python3.12 src/main.py assignment transfer-owner \
+  --from "Jane Doe" \
+  --to "Mary Smith"
+```
+
+Also transfer matching backup owner slots:
+
+```bash
+python3.12 src/main.py assignment transfer-owner \
+  --from "Jane Doe" \
+  --to "Mary Smith" \
+  --include-backup-owner
+```
+
+Clear all assignment owners:
+
+```bash
+python3.12 src/main.py assignment clear-all-owners
+```
+
+Also clear all backup owner slots:
+
+```bash
+python3.12 src/main.py assignment clear-all-owners \
+  --include-backup-owner
+```
+
 Remove one assignment:
 
 ```bash

@@ -1,0 +1,4 @@
+patches:
+- action: clear_all_owners
+  owner: ''
+  backup_owner: ''
