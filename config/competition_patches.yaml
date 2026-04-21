@@ -316,3 +316,69 @@ patches:
   category_raw: '3'
   response_id: R0003
   is_group_competition: 'false'
+- action: add
+  participant_name: Aniah
+  competition_type: choir
+  category_raw: ''
+  response_id: R0003
+  is_group_competition: 'true'
+- action: add
+  participant_name: Lucia
+  competition_type: choir
+  category_raw: ''
+  response_id: R0003
+  is_group_competition: 'true'
+- action: add
+  participant_name: Zarah
+  competition_type: choir
+  category_raw: ''
+  response_id: R0003
+  is_group_competition: 'true'
+- action: add
+  participant_name: Jordan
+  competition_type: choir
+  category_raw: ''
+  response_id: R0004
+  is_group_competition: 'true'
+- action: add
+  participant_name: Megan Gilhausen
+  competition_type: choir
+  category_raw: ''
+  response_id: R0005
+  is_group_competition: 'true'
+- action: add
+  participant_name: Eliana
+  competition_type: choir
+  category_raw: ''
+  response_id: R0007
+  is_group_competition: 'true'
+- action: add
+  participant_name: Talya
+  competition_type: choir
+  category_raw: ''
+  response_id: R0007
+  is_group_competition: 'true'
+- action: add
+  participant_name: Hailey
+  competition_type: choir
+  category_raw: ''
+  response_id: R0008
+  is_group_competition: 'true'
+- action: add
+  participant_name: Lucia
+  competition_type: librarians_report
+  category_raw: The Goddess of Spring
+  response_id: R0003
+  is_group_competition: 'false'
+- action: add
+  participant_name: Lucia
+  competition_type: librarians_report
+  category_raw: sleepless sleepover
+  response_id: R0003
+  is_group_competition: 'false'
+- action: add
+  participant_name: Lucia
+  competition_type: librarians_report
+  category_raw: Mother Mick
+  response_id: R0003
+  is_group_competition: 'false'
