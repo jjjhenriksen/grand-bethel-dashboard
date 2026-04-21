@@ -56,6 +56,7 @@ from enrich_schedule import (
     map_competitions_to_blocks,
     map_excursions_to_days,
 )
+from import_competition_forms import import_competition_forms
 from load_raw import discover_input_csv, load_field_map, load_raw_csv
 from normalize_responses import normalize_responses
 from parse_competitions import build_competition_rows
@@ -69,6 +70,13 @@ from program_patches import (
     load_program_patches,
     reset_program_patches,
     summarize_program_patches,
+)
+from respondent_patches import (
+    add_respondent_patch,
+    apply_respondent_patches,
+    load_respondent_patches,
+    reset_respondent_patches,
+    summarize_respondent_patches,
 )
 from schedule_config import (
     add_advance_submission_competition,
@@ -92,6 +100,7 @@ ATTENDEE_PATCHES_PATH = CONFIG_DIR / "attendee_patches.yaml"
 EXCURSION_PATCHES_PATH = CONFIG_DIR / "excursion_patches.yaml"
 SCHEDULE_MAP_PATH = CONFIG_DIR / "schedule_map.yaml"
 ASSIGNMENT_PATCHES_PATH = CONFIG_DIR / "assignment_patches.yaml"
+RESPONDENT_PATCHES_PATH = CONFIG_DIR / "respondent_patches.yaml"
 
 
 def load_yaml(path: Path) -> dict:
@@ -294,7 +303,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Grand Bethel registration and schedule planning CLI.")
     subparsers = parser.add_subparsers(
         dest="command",
-        metavar="{run,program,override,competition,attendee,excursion,examples}",
+        metavar="{run,program,respondent,override,competition,attendee,assignment,excursion,examples}",
     )
 
     run_parser = subparsers.add_parser("run", help="Run the registration and schedule pipeline.")
@@ -347,6 +356,56 @@ def build_arg_parser() -> argparse.ArgumentParser:
     program_show_parser.set_defaults(route="program.show_patches")
     program_reset_parser = program_subparsers.add_parser("reset-patches", help="Reset program patches back to an empty template.")
     program_reset_parser.set_defaults(route="program.reset_patches")
+
+    respondent_parser = subparsers.add_parser("respondent", help="Manage synthetic respondent rows without editing the raw CSV.")
+    respondent_subparsers = respondent_parser.add_subparsers(dest="respondent_command")
+
+    respondent_add_parser = respondent_subparsers.add_parser("add", help="Add one synthetic respondent row.")
+    respondent_add_parser.set_defaults(route="respondent.add")
+    respondent_add_parser.add_argument("--response-id", required=True, help="Unique synthetic id such as MANUAL001.")
+    respondent_add_parser.add_argument("--timestamp", default="")
+    respondent_add_parser.add_argument("--respondent-name", required=True)
+    respondent_add_parser.add_argument("--attending-grand-bethel", default="yes")
+    respondent_add_parser.add_argument("--family-attendance", required=True)
+    respondent_add_parser.add_argument("--contact-phone", default="")
+    respondent_add_parser.add_argument("--emergency-contact-name", default="")
+    respondent_add_parser.add_argument("--emergency-contact-phone", default="")
+    respondent_add_parser.add_argument("--family-room-preference", default="")
+    respondent_add_parser.add_argument("--girl-adult-only-room-preference", default="")
+    respondent_add_parser.add_argument("--bed-share-acknowledged", default="")
+    respondent_add_parser.add_argument("--allergies-raw", default="")
+    respondent_add_parser.add_argument("--lunch-raw", default="")
+    respondent_add_parser.add_argument("--excursions-raw", default="")
+    respondent_add_parser.add_argument("--variety-show-interest", default="")
+    respondent_add_parser.add_argument("--variety-show-names", default="")
+    respondent_add_parser.add_argument("--variety-show-participant-categories", default="")
+    respondent_add_parser.add_argument("--choir-interest", default="")
+    respondent_add_parser.add_argument("--choir-names", default="")
+    respondent_add_parser.add_argument("--performing-arts-interest", default="")
+    respondent_add_parser.add_argument("--performing-arts-categories", default="")
+    respondent_add_parser.add_argument("--performing-arts-participants", default="")
+    respondent_add_parser.add_argument("--performing-arts-participant-categories", default="")
+    respondent_add_parser.add_argument("--arts-and-crafts-interest", default="")
+    respondent_add_parser.add_argument("--arts-and-crafts-categories", default="")
+    respondent_add_parser.add_argument("--arts-and-crafts-participant-categories", default="")
+    respondent_add_parser.add_argument("--librarians-report-interest", default="")
+    respondent_add_parser.add_argument("--librarians-report-names", default="")
+    respondent_add_parser.add_argument("--essay-interest", default="")
+    respondent_add_parser.add_argument("--essay-names", default="")
+    respondent_add_parser.add_argument("--ritual-interest", default="")
+    respondent_add_parser.add_argument("--ritual-participant-categories", default="")
+    respondent_add_parser.add_argument("--sew-and-show-interest", default="")
+    respondent_add_parser.add_argument("--sew-and-show-names", default="")
+
+    respondent_remove_parser = respondent_subparsers.add_parser("remove", help="Remove one synthetic respondent row by response id.")
+    respondent_remove_parser.set_defaults(route="respondent.remove")
+    respondent_remove_parser.add_argument("--response-id", required=True)
+
+    respondent_show_parser = respondent_subparsers.add_parser("show-patches", help="Print the current respondent patch file.")
+    respondent_show_parser.set_defaults(route="respondent.show_patches")
+
+    respondent_reset_parser = respondent_subparsers.add_parser("reset-patches", help="Reset respondent patches back to an empty template.")
+    respondent_reset_parser.set_defaults(route="respondent.reset_patches")
 
     override_parser = subparsers.add_parser("override", help="Manage Bethel-specific schedule overrides.")
     override_subparsers = override_parser.add_subparsers(dest="override_command")
@@ -436,6 +495,28 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     competition_show_parser = competition_subparsers.add_parser("show-patches", help="Print the current competition patch file.")
     competition_show_parser.set_defaults(route="competition.show_patches")
+    competition_import_forms_parser = competition_subparsers.add_parser(
+        "import-forms",
+        help="OCR finalized competition entry forms and convert them into competition patches.",
+    )
+    competition_import_forms_parser.set_defaults(route="competition.import_forms")
+    competition_import_forms_parser.add_argument("--forms-dir", type=Path, required=True)
+    competition_import_forms_parser.add_argument(
+        "--review-path",
+        type=Path,
+        default=OUTPUT_DIR / "competition_form_import_review.csv",
+        help="Where to write the import review CSV.",
+    )
+    competition_import_forms_parser.add_argument(
+        "--input",
+        type=Path,
+        help="Optional raw registration CSV override. Defaults to the CSV in data/raw/.",
+    )
+    competition_import_forms_parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="Write matched imports into config/competition_patches.yaml.",
+    )
     competition_reset_parser = competition_subparsers.add_parser("reset-patches", help="Reset competition patches back to an empty template.")
     competition_reset_parser.set_defaults(route="competition.reset_patches")
 
@@ -812,6 +893,7 @@ def run_pipeline(input_override: Path | None) -> None:
     attendee_patches = load_attendee_patches(ATTENDEE_PATCHES_PATH)
     excursion_patches = load_excursion_patches(EXCURSION_PATCHES_PATH)
     assignment_patches = load_assignment_patches(ASSIGNMENT_PATCHES_PATH)
+    respondent_patches = load_respondent_patches(RESPONDENT_PATCHES_PATH)
     schedule_map["bethel_overrides"] = bethel_overrides
     program_patches = load_program_patches(PROGRAM_PATCHES_PATH)
     competition_patches = load_competition_patches(COMPETITION_PATCHES_PATH)
@@ -819,6 +901,7 @@ def run_pipeline(input_override: Path | None) -> None:
     input_csv = input_override if input_override else discover_input_csv(DATA_RAW_DIR)
     raw_df, _ = load_raw_csv(input_csv, field_map)
     responses_df = normalize_responses(raw_df)
+    responses_df = apply_respondent_patches(responses_df, respondent_patches)
     response_rows = [response.to_dict() for _, response in responses_df.iterrows()]
     excursion_options = derive_excursion_options(response_rows)
     program_blocks = parse_program_blocks(DATA_RAW_DIR / "2026 GB Prelim Program.md")
@@ -1109,6 +1192,82 @@ def main() -> None:
         run_pipeline(args.input)
         return
 
+    if route == "respondent.add":
+        fields = {
+            "timestamp": args.timestamp,
+            "respondent_name": args.respondent_name,
+            "attending_grand_bethel": args.attending_grand_bethel,
+            "family_attendance": args.family_attendance,
+            "contact_phone": args.contact_phone,
+            "emergency_contact_name": args.emergency_contact_name,
+            "emergency_contact_phone": args.emergency_contact_phone,
+            "family_room_preference": args.family_room_preference,
+            "girl_adult_only_room_preference": args.girl_adult_only_room_preference,
+            "bed_share_acknowledged": args.bed_share_acknowledged,
+            "allergies_raw": args.allergies_raw,
+            "lunch_raw": args.lunch_raw,
+            "excursions_raw": args.excursions_raw,
+            "variety_show_interest": args.variety_show_interest,
+            "variety_show_names": args.variety_show_names,
+            "variety_show_participant_categories": args.variety_show_participant_categories,
+            "choir_interest": args.choir_interest,
+            "choir_names": args.choir_names,
+            "performing_arts_interest": args.performing_arts_interest,
+            "performing_arts_categories": args.performing_arts_categories,
+            "performing_arts_participants": args.performing_arts_participants,
+            "performing_arts_participant_categories": args.performing_arts_participant_categories,
+            "arts_and_crafts_interest": args.arts_and_crafts_interest,
+            "arts_and_crafts_categories": args.arts_and_crafts_categories,
+            "arts_and_crafts_participant_categories": args.arts_and_crafts_participant_categories,
+            "librarians_report_interest": args.librarians_report_interest,
+            "librarians_report_names": args.librarians_report_names,
+            "essay_interest": args.essay_interest,
+            "essay_names": args.essay_names,
+            "ritual_interest": args.ritual_interest,
+            "ritual_participant_categories": args.ritual_participant_categories,
+            "sew_and_show_interest": args.sew_and_show_interest,
+            "sew_and_show_names": args.sew_and_show_names,
+        }
+        patches = add_respondent_patch(
+            RESPONDENT_PATCHES_PATH,
+            {
+                "action": "add",
+                "response_id": args.response_id,
+                "fields": fields,
+            },
+        )
+        print(f"Saved {RESPONDENT_PATCHES_PATH}")
+        print(summarize_respondent_patches(patches))
+        print("Run `grand-bethel run` to regenerate outputs.")
+        return
+
+    if route == "respondent.remove":
+        patches = add_respondent_patch(
+            RESPONDENT_PATCHES_PATH,
+            {
+                "action": "remove",
+                "response_id": args.response_id,
+            },
+        )
+        print(f"Saved {RESPONDENT_PATCHES_PATH}")
+        print(summarize_respondent_patches(patches))
+        print("Run `grand-bethel run` to regenerate outputs.")
+        return
+
+    if route == "respondent.show_patches":
+        patches = load_respondent_patches(RESPONDENT_PATCHES_PATH)
+        print(summarize_respondent_patches(patches))
+        if RESPONDENT_PATCHES_PATH.exists():
+            with RESPONDENT_PATCHES_PATH.open("r", encoding="utf-8") as handle:
+                print(handle.read().rstrip())
+        return
+
+    if route == "respondent.reset_patches":
+        patches = reset_respondent_patches(RESPONDENT_PATCHES_PATH)
+        print(f"Saved {RESPONDENT_PATCHES_PATH}")
+        print(summarize_respondent_patches(patches))
+        return
+
     if route == "override.add_block":
         overrides = add_extra_block(
             BETHEL_OVERRIDES_PATH,
@@ -1288,6 +1447,24 @@ def main() -> None:
         print(summarize_competition_patches(patches))
         with COMPETITION_PATCHES_PATH.open("r", encoding="utf-8") as handle:
             print(handle.read().rstrip())
+        return
+
+    if route == "competition.import_forms":
+        summary = import_competition_forms(
+            forms_dir=args.forms_dir,
+            competition_patches_path=COMPETITION_PATCHES_PATH,
+            field_map_path=CONFIG_DIR / "field_map.yaml",
+            review_path=args.review_path,
+            input_csv=args.input,
+            apply=args.apply,
+        )
+        print(f"entries={summary['total_entries']}")
+        print(f"matched={summary['matched_entries']}")
+        print(f"unmatched={summary['unmatched_entries']}")
+        print(f"written_patches={summary['written_patches']}")
+        print(f"review_csv={summary['review_path']}")
+        for issue in summary["issues"]:
+            print(f"- {issue}")
         return
 
     if route == "competition.reset_patches":
@@ -1654,6 +1831,9 @@ def main() -> None:
                     "Add a competition entry:",
                     '  grand-bethel competition add --response-id R0005 --participant-name Megan --competition-type choir --is-group-competition true',
                     "",
+                    "Add a synthetic respondent without editing the raw CSV:",
+                    '  grand-bethel respondent add --response-id MANUAL001 --respondent-name "Jane Doe" --family-attendance "Jane Doe - Adult Sophie Doe - 14" --contact-phone "555-123-4567"',
+                    "",
                     "Mark one existing competition row as group or individual:",
                     '  grand-bethel competition set-group-flag --response-id R0003 --participant-name Lucia --competition-type performing_arts --category-raw "Instrumental (Any instrument, including piano)" --is-group-competition false',
                     "",
@@ -1707,6 +1887,12 @@ def main() -> None:
                     "",
                     "Show competition timing mappings:",
                     "  grand-bethel competition show-timing",
+                    "",
+                    "Preview finalized competition form imports:",
+                    '  grand-bethel competition import-forms --forms-dir "/Users/you/Desktop/Grand Bethel Competition Entry Forms"',
+                    "",
+                    "Write matched finalized form imports into competition patches:",
+                    '  grand-bethel competition import-forms --forms-dir "/Users/you/Desktop/Grand Bethel Competition Entry Forms" --apply',
                     "",
                     "Add another advance-submitted competition type:",
                     "  grand-bethel competition add-advance-submission --competition-type miss_congeniality",

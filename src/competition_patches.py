@@ -60,7 +60,9 @@ def _matches_text(actual: str, expected: str) -> bool:
         return True
     if normalized_actual == normalized_expected:
         return True
-    if normalized_expected in normalized_actual or normalized_actual in normalized_expected:
+    if normalized_actual and normalized_expected and (
+        normalized_expected in normalized_actual or normalized_actual in normalized_expected
+    ):
         return True
 
     actual_tokens = {token for token in normalized_actual.split(" ") if token}

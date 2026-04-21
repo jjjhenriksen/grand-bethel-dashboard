@@ -69,32 +69,37 @@ def response_id_for_index(index: int) -> str:
     return f"R{index + 1:04d}"
 
 
+def normalize_response_record(record: Dict[str, str], response_id: str) -> Dict[str, str]:
+    normalized = {column: str(value).strip() for column, value in record.items()}
+    normalized["response_id"] = str(response_id).strip()
+    normalized["contact_phone"] = normalize_phone(normalized.get("contact_phone", ""))
+    normalized["emergency_contact_name"] = clean_text(normalized.get("emergency_contact_name", ""))
+    normalized["emergency_contact_phone"] = normalize_phone(normalized.get("emergency_contact_phone", ""))
+    normalized["attending_grand_bethel"] = normalize_bool(normalized.get("attending_grand_bethel", ""))
+    normalized["family_room_preference"] = normalize_preference(normalized.get("family_room_preference", ""))
+    normalized["girl_adult_only_room_preference"] = normalize_preference(
+        normalized.get("girl_adult_only_room_preference", "")
+    )
+    normalized["bed_share_acknowledged"] = normalize_bool(normalized.get("bed_share_acknowledged", ""))
+    normalized["allergies_raw"] = clean_text(normalized.get("allergies_raw", ""))
+    normalized["excursions_raw"] = clean_text(normalized.get("excursions_raw", ""))
+    for field in [
+        "variety_show_interest",
+        "choir_interest",
+        "performing_arts_interest",
+        "arts_and_crafts_interest",
+        "librarians_report_interest",
+        "essay_interest",
+        "ritual_interest",
+        "sew_and_show_interest",
+    ]:
+        normalized[field] = normalize_bool(normalized.get(field, ""))
+    return normalized
+
+
 def normalize_responses(raw_df: pd.DataFrame) -> pd.DataFrame:
     records: List[Dict[str, str]] = []
     for index, row in raw_df.fillna("").iterrows():
-        record = {column: str(value).strip() for column, value in row.items()}
-        record["response_id"] = response_id_for_index(index)
-        record["contact_phone"] = normalize_phone(record.get("contact_phone", ""))
-        record["emergency_contact_name"] = clean_text(record.get("emergency_contact_name", ""))
-        record["emergency_contact_phone"] = normalize_phone(record.get("emergency_contact_phone", ""))
-        record["attending_grand_bethel"] = normalize_bool(record.get("attending_grand_bethel", ""))
-        record["family_room_preference"] = normalize_preference(record.get("family_room_preference", ""))
-        record["girl_adult_only_room_preference"] = normalize_preference(
-            record.get("girl_adult_only_room_preference", "")
-        )
-        record["bed_share_acknowledged"] = normalize_bool(record.get("bed_share_acknowledged", ""))
-        record["allergies_raw"] = clean_text(record.get("allergies_raw", ""))
-        record["excursions_raw"] = clean_text(record.get("excursions_raw", ""))
-        for field in [
-            "variety_show_interest",
-            "choir_interest",
-            "performing_arts_interest",
-            "arts_and_crafts_interest",
-            "librarians_report_interest",
-            "essay_interest",
-            "ritual_interest",
-            "sew_and_show_interest",
-        ]:
-            record[field] = normalize_bool(record.get(field, ""))
-        records.append(record)
+        raw_record = {column: str(value).strip() for column, value in row.items()}
+        records.append(normalize_response_record(raw_record, response_id_for_index(index)))
     return pd.DataFrame(records)

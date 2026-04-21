@@ -170,6 +170,27 @@ python3.12 src/main.py competition schedule-entry \
 
 Some competition types are not live scheduled events at all. They are submitted in advance and should not appear as unscheduled. The schedule map currently treats `librarians_report` and `essay` that way, so those entries will show up as `submitted_in_advance` instead of `unscheduled_in_program`.
 
+If finalized competition forms arrive separately as PDFs or images, import them into the existing dashboard data without editing the registration CSV:
+
+```bash
+python3.12 src/main.py competition import-forms \
+  --forms-dir "/Users/you/Desktop/Grand Bethel Competition Entry Forms"
+```
+
+That writes a review CSV to `outputs/competition_form_import_review.csv` so you can see what matched and what still needs attention. When the preview looks right, apply the matched imports into `config/competition_patches.yaml`:
+
+```bash
+python3.12 src/main.py competition import-forms \
+  --forms-dir "/Users/you/Desktop/Grand Bethel Competition Entry Forms" \
+  --apply
+```
+
+Then rerun the pipeline:
+
+```bash
+python3.12 src/main.py run
+```
+
 Add another competition type to that advance-submission list:
 
 ```bash
@@ -431,6 +452,53 @@ python3.12 src/main.py assignment reset-patches
 
 Assignment patches are stored in `config/assignment_patches.yaml` and are applied automatically on each pipeline run.
 
+## Respondent Patch CLI
+
+If a whole registration response is missing from the raw CSV export, use a respondent patch to add a synthetic response row.
+
+Add one respondent:
+
+```bash
+python3.12 src/main.py respondent add \
+  --response-id MANUAL001 \
+  --respondent-name "Jane Doe" \
+  --family-attendance "Jane Doe - Adult Sophie Doe - 14" \
+  --contact-phone "555-123-4567" \
+  --attending-grand-bethel yes
+```
+
+You can also include optional fields such as:
+
+```bash
+python3.12 src/main.py respondent add \
+  --response-id MANUAL002 \
+  --respondent-name "Smith Family" \
+  --family-attendance "Mary Smith - Adult Ella Smith - 12" \
+  --contact-phone "555-222-3333" \
+  --emergency-contact-name "John Smith" \
+  --emergency-contact-phone "555-444-5555" \
+  --lunch-raw "Mary - S, Ella - P" \
+  --excursions-raw "Sequoia National Park (Thursday)" \
+  --choir-interest yes \
+  --choir-names "Ella Smith"
+```
+
+Remove one synthetic respondent:
+
+```bash
+python3.12 src/main.py respondent remove \
+  --response-id MANUAL001
+```
+
+Show or reset respondent patches:
+
+```bash
+python3.12 src/main.py respondent show-patches
+python3.12 src/main.py respondent reset-patches
+```
+
+Respondent patches are stored in `config/respondent_patches.yaml` and are applied automatically on each pipeline run.
+
 ## Attendee Patch CLI
 
 If an attendee should be added or removed without changing the raw form export, use an attendee patch.
@@ -504,14 +572,14 @@ python3.12 src/main.py excursion reset-patches
 
 Excursion patches are stored in `config/excursion_patches.yaml` and are applied automatically on each pipeline run.
 
-Legacy flat commands still work, but the grouped `program ...`, `competition ...`, `attendee ...`, `excursion ...`, and `override ...` commands are the preferred interface.
+Legacy flat commands still work, but the grouped `program ...`, `respondent ...`, `competition ...`, `attendee ...`, `assignment ...`, `excursion ...`, and `override ...` commands are the preferred interface.
 
 ## Outputs
 
 The pipeline writes all derived files to `outputs/`:
 
 - `attendees.csv`: one row per parsed attendee from the family attendance text.
-- `families.csv`: one row per registration response.
+- `families.csv`: one row per registration response, including synthetic respondent patches.
 - `competitions.csv`: one row per participant-entry pair where it can be inferred.
 - `excursions.csv`: one row per family-per-excursion interest.
 - `meals.csv`: one row per parsed lunch choice.
@@ -531,7 +599,8 @@ The pipeline writes all derived files to `outputs/`:
 
 ## Assumptions
 
-- The raw CSV is the source of truth.
+- The raw CSV is the source of truth for imported responses.
+- `config/respondent_patches.yaml` is the source of truth for synthetic manually added responses.
 - The `Name` field from the form is not trusted for attendee rosters.
 - Attendees are parsed from the free-text family attendance field.
 - Boolean normalization accepts common variants such as `yes`, `y`, `true`, `no`, `n`, `false`.
@@ -557,5 +626,6 @@ The pipeline writes all derived files to `outputs/`:
 - Bethel-specific local overrides live in `config/bethel_overrides.yaml` and can be managed through the CLI.
 - Parsed program cleanup patches live in `config/program_patches.yaml` and can also be managed through the CLI.
 - Competition entry cleanup patches live in `config/competition_patches.yaml` and can also be managed through the CLI.
+- Synthetic respondent patches live in `config/respondent_patches.yaml` and can also be managed through the CLI.
 - Excursion decision patches live in `config/excursion_patches.yaml` and can also be managed through the CLI.
-- No derived files should be edited manually. Re-run the pipeline from the raw CSV instead.
+- No derived files should be edited manually. Re-run the pipeline from the raw CSV and configured patch files instead.

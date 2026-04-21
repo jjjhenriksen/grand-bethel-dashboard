@@ -782,7 +782,11 @@ def _js_string(value: str) -> str:
     return json.dumps(value)
 
 
-def _site_shell(title: str, subtitle: str, current_page: str, content: str, generated_at: str) -> str:
+def _wrap_dynamic_now_next(content: str, *, include_owner: bool) -> str:
+    return f"<div data-now-next-critical='true' data-include-owner={'true' if include_owner else 'false'}>{content}</div>"
+
+
+def _site_shell(title: str, subtitle: str, current_page: str, content: str, generated_at: str, program_blocks: list[dict[str, Any]]) -> str:
     nav = [
         ("index.html", "Home"),
         ("operations.html", "Operations"),
@@ -1087,6 +1091,194 @@ def _site_shell(title: str, subtitle: str, current_page: str, content: str, gene
       const liveStatusLabel = document.getElementById("live-status-label");
       const liveMeta = document.getElementById("live-meta");
       let latestVersion = { _js_string(generated_at) };
+      let programBlocks = {json.dumps(program_blocks)};
+
+      function escapeHtml(value) {{
+        return String(value == null ? "" : value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }}
+
+      function ownerForBlock(row) {{
+        const title = String(row && row.event_title || "").toLowerCase();
+        const eventType = String(row && row.event_type || "").toLowerCase();
+        const competitionRelated = eventType === "competition_related";
+        if (title.includes("registration")) return "Registrar";
+        if (title.includes("lunch") || title.includes("luncheon") || title.includes("banquet")) return "Hospitality Lead";
+        if (title.includes("excursion") || title.includes("adventure park")) return "Excursions Lead";
+        if (competitionRelated || title.includes("variety show") || title.includes("arts & crafts") || title.includes("ritual")) return "Competition Lead";
+        if (eventType === "bethel_local") return "Bethel 337 Lead";
+        return "Operations Lead";
+      }}
+
+      function parseClockOnDate(dateText, timeText) {{
+        const cleanDate = String(dateText || "").trim();
+        const cleanTime = String(timeText || "").trim().toLowerCase().replaceAll(" ", "");
+        if (!cleanDate || !cleanTime) return null;
+        const match = cleanTime.match(/^(\\d{{1,2}})(?::(\\d{{2}}))?(am|pm)$/);
+        if (!match) return null;
+        let hour = Number(match[1]);
+        const minute = Number(match[2] || "0");
+        const meridiem = match[3];
+        if (meridiem === "pm" && hour !== 12) hour += 12;
+        if (meridiem === "am" && hour === 12) hour = 0;
+        return new Date(`${{cleanDate}}T00:00:00`);
+      }}
+
+      function dateWithClock(dateText, timeText) {{
+        const base = parseClockOnDate(dateText, timeText);
+        const cleanTime = String(timeText || "").trim().toLowerCase().replaceAll(" ", "");
+        if (!base || !cleanTime) return null;
+        const match = cleanTime.match(/^(\\d{{1,2}})(?::(\\d{{2}}))?(am|pm)$/);
+        if (!match) return null;
+        let hour = Number(match[1]);
+        const minute = Number(match[2] || "0");
+        const meridiem = match[3];
+        if (meridiem === "pm" && hour !== 12) hour += 12;
+        if (meridiem === "am" && hour === 12) hour = 0;
+        base.setHours(hour, minute, 0, 0);
+        return base;
+      }}
+
+      function blockWindow(row) {{
+        const eventDate = row && row.event_date || "";
+        const startTime = row && (row.start_time_raw || String(row.time_raw || "").split("-", 1)[0].trim()) || "";
+        const endTime = row && row.end_time_raw || "";
+        const start = dateWithClock(eventDate, startTime);
+        let end = dateWithClock(eventDate, endTime);
+        if (start && !end) {{
+          end = new Date(start.getTime() + 60 * 60 * 1000);
+        }}
+        return [start, end];
+      }}
+
+      function getCurrentContext(now, rows) {{
+        const windows = [];
+        for (const row of rows || []) {{
+          const [start, end] = blockWindow(row);
+          if (start) windows.push([start, end, row]);
+        }}
+        windows.sort((a, b) => a[0] - b[0]);
+        if (!windows.length) {{
+          return {{ current_block: {{}}, next_block: {{}}, deadlines: [], state: "unknown", now }};
+        }}
+        const earliestStart = windows[0][0];
+        const latestEnd = windows.reduce((latest, item) => {{
+          const candidate = item[1] || item[0];
+          return candidate > latest ? candidate : latest;
+        }}, windows[0][1] || windows[0][0]);
+        const currentBlock = (windows.find(([start, end]) => end && start <= now && now <= end) || [null, null, {{}}])[2];
+        const nextBlock = (windows.find(([start]) => start >= now) || [null, null, windows[0][2]])[2];
+        let state = "between";
+        if (now < earliestStart) state = "before";
+        else if (now > latestEnd) state = "after";
+        else if (currentBlock && Object.keys(currentBlock).length) state = "active";
+        const baseline = state === "after" ? latestEnd : now;
+        const deadlines = windows
+          .filter(([start]) => baseline <= start && start <= new Date(baseline.getTime() + 48 * 60 * 60 * 1000))
+          .slice(0, 3)
+          .map((item) => item[2]);
+        return {{
+          current_block: currentBlock,
+          next_block: nextBlock,
+          deadlines,
+          state,
+          now,
+          program_start: earliestStart,
+          program_end: latestEnd,
+        }};
+      }}
+
+      function planningPhaseLabel(context) {{
+        const state = context.state;
+        const nowDt = context.now;
+        const programStart = context.program_start;
+        if (state === "before" && nowDt && programStart) {{
+          const days = Math.max(Math.floor((programStart - new Date(nowDt.getFullYear(), nowDt.getMonth(), nowDt.getDate())) / (24 * 60 * 60 * 1000)), 0);
+          return [`Planning Phase: Pre-Event (T-${{days}} days)`, "Status: No active program blocks"];
+        }}
+        if (state === "after") return ["Planning Phase: Post-Event", "Status: No active program blocks"];
+        return ["Program Phase: Live Session", "Status: No active program blocks"];
+      }}
+
+      function formatDate(date) {{
+        return new Intl.DateTimeFormat(undefined, {{ month: "long", day: "2-digit", year: "numeric" }}).format(date);
+      }}
+
+      function formatWeekdayDate(date) {{
+        return new Intl.DateTimeFormat(undefined, {{ weekday: "long", month: "long", day: "2-digit", year: "numeric" }}).format(date);
+      }}
+
+      function renderSummaryEntry(row, emptyLabel, includeOwner) {{
+        if (!row || !Object.keys(row).length) {{
+          return `<article class="summary-card"><h3>${{escapeHtml(emptyLabel)}}</h3><p class="subtle">No active program block at this time.</p></article>`;
+        }}
+        const meta = [String(row.day_name || "").trim() || String(row.day_label || "").trim(), String(row.time_raw || "").trim()];
+        if (includeOwner) meta.push(ownerForBlock(row));
+        const metaBits = meta.filter(Boolean).join(" | ");
+        return `<article class="summary-card"><h3>${{escapeHtml(emptyLabel)}}</h3><p><strong>${{escapeHtml(String(row.event_title || ""))}}</strong></p><p class="summary-meta">${{escapeHtml(metaBits)}}</p></article>`;
+      }}
+
+      function renderNowNextCriticalClient(includeOwner) {{
+        const context = getCurrentContext(new Date(), programBlocks);
+        if (!context || context.state === "unknown") {{
+          return `<section class="panel"><h2>Now / Next / Critical</h2><p class="empty">Program timing is not available.</p></section>`;
+        }}
+        const nowDt = context.now;
+        const state = context.state;
+        const currentBlock = context.current_block || {{}};
+        const nextBlock = context.next_block || {{}};
+        const deadlines = context.deadlines || [];
+        const preEventMode = state === "before";
+        const currentLabel = preEventMode ? "Current Planning State" : "Now";
+        const nextLabel = preEventMode ? "Next Scheduled Block" : "Next";
+        const criticalLabel = preEventMode ? "Upcoming Deadlines" : "Critical";
+        let criticalHtml = deadlines.map((row) => {{
+          const when = `${{String(row.day_name || "").trim() || String(row.day_label || "").trim()}} | ${{String(row.time_raw || "").trim()}}`;
+          return `<li><strong>${{escapeHtml(String(row.event_title || ""))}}</strong> <span class="subtle">(${{escapeHtml(when)}})</span></li>`;
+        }}).join("");
+        if (!criticalHtml) {{
+          if (state === "before") criticalHtml = "<li>Deadlines will populate as Grand Bethel approaches.</li>";
+          else if (state === "after") criticalHtml = "<li>No remaining program deadlines.</li>";
+          else criticalHtml = "<li>No deadlines in the next 48 hours.</li>";
+        }}
+        let currentMessage = "No active program block at this time.";
+        const [phaseLine, statusLine] = planningPhaseLabel(context);
+        let contextNote = `<p class="summary-note">Today: ${{escapeHtml(formatWeekdayDate(nowDt))}}</p>`;
+        if (state === "before") {{
+          currentMessage = "Grand Bethel has not started yet.";
+          contextNote = `<p class="summary-note">Current date: ${{escapeHtml(formatDate(nowDt))}}. Program begins ${{escapeHtml(formatDate(context.program_start))}}.</p>`;
+        }} else if (state === "after") {{
+          currentMessage = "Grand Bethel has concluded.";
+          contextNote = `<p class="summary-note">Current date: ${{escapeHtml(formatDate(nowDt))}}. Program ended ${{escapeHtml(formatDate(context.program_end))}}.</p>`;
+        }}
+        let nextTimeNote = "";
+        if (nextBlock && Object.keys(nextBlock).length) {{
+          const nextDay = String(nextBlock.day_name || "").trim() || String(nextBlock.day_label || "").trim();
+          const nextTime = String(nextBlock.time_raw || "").trim();
+          if (preEventMode && (nextDay || nextTime)) {{
+            nextTimeNote = `<p class="summary-meta">First scheduled program block: ${{escapeHtml([nextDay, nextTime].filter(Boolean).join(" | "))}}</p>`;
+          }} else if (nextTime) {{
+            nextTimeNote = `<p class="summary-meta">Next block begins at ${{escapeHtml(nextTime)}}.</p>`;
+          }}
+        }}
+        const currentCardHtml = `<article class="summary-card"><h3>${{escapeHtml(currentLabel)}}</h3><p>${{escapeHtml(currentMessage)}}</p><p class="summary-meta">${{escapeHtml(phaseLine)}}</p><p class="summary-meta">${{escapeHtml(statusLine)}}</p>${{nextTimeNote}}</article>`;
+        const fallbackNote = (!Object.keys(currentBlock).length && state !== "after")
+          ? `<p class="summary-note">Using the nearest upcoming program window from the generated schedule.</p>`
+          : "";
+        return `<section class="panel"><h2>Now / Next / Critical</h2><div class="summary-grid">${{Object.keys(currentBlock).length ? renderSummaryEntry(currentBlock, currentLabel, includeOwner) : currentCardHtml}}${{renderSummaryEntry(nextBlock, nextLabel, includeOwner)}}<article class="summary-card"><h3>${{escapeHtml(criticalLabel)}}</h3><ul class="action-list">${{criticalHtml}}</ul></article></div>${{contextNote}}${{fallbackNote}}</section>`;
+      }}
+
+      function hydrateDynamicSections() {{
+        const hosts = document.querySelectorAll("[data-now-next-critical='true']");
+        for (const host of hosts) {{
+          const includeOwner = host.getAttribute("data-include-owner") === "true";
+          host.innerHTML = renderNowNextCriticalClient(includeOwner);
+        }}
+      }}
 
       function setStatus(mode, label, meta) {{
         if (!liveStatus || !liveStatusLabel || !liveMeta) {{
@@ -1108,6 +1300,9 @@ def _site_shell(title: str, subtitle: str, current_page: str, content: str, gene
           const payload = await response.json();
           const nextVersion = typeof payload.generated_at === "string" ? payload.generated_at : "";
           const nextPage = payload.pages && payload.pages[pageName];
+          if (Array.isArray(payload.program_blocks)) {{
+            programBlocks = payload.program_blocks;
+          }}
           if (!nextPage) {{
             throw new Error("Missing page payload for " + pageName);
           }}
@@ -1123,15 +1318,18 @@ def _site_shell(title: str, subtitle: str, current_page: str, content: str, gene
             if (pageContent) {{
               pageContent.innerHTML = nextPage.content || "";
             }}
+            hydrateDynamicSections();
             setStatus("live", "Live updates on", "Updated " + nextVersion);
             return;
           }}
+          hydrateDynamicSections();
           setStatus("live", "Live updates on", "Last checked " + new Date().toLocaleTimeString());
         }} catch (error) {{
           setStatus("error", "Live updates unavailable", "Serve the site over http to enable auto-refresh.");
         }}
       }}
 
+      hydrateDynamicSections();
       window.setTimeout(refreshPage, 1200);
       window.setInterval(refreshPage, 15000);
     }})();
@@ -1184,7 +1382,7 @@ def build_site(
     operational_duties_html = _render_operational_duties_summary(STATE["operational_duties"])
 
     home_content = (
-        f"{now_next_critical_public}"
+        f"{_wrap_dynamic_now_next(now_next_critical_public, include_owner=False)}"
         f"<section class='panel'><h2>Operational Signals</h2>{operational_signals_html}</section>"
         f"<section class='panel'><h2>Session Program</h2>{program_preview_html}</section>"
         "<section class='overview-grid'>"
@@ -1201,7 +1399,7 @@ def build_site(
     ) or "<li>No open issues.</li>"
     assignment_items = _render_assignment_lists(assignments)
     operations_content = (
-        f"{now_next_critical_ops}"
+        f"{_wrap_dynamic_now_next(now_next_critical_ops, include_owner=True)}"
         "<section class='panel'><h2>Immediate Actions</h2>"
         "<div class='card-grid'>"
         f"<article class='mini-card'><h3>Next Program Block</h3>{_render_kv([('Event', next_block.get('event_title', 'None')), ('Day', next_block.get('day_name', '') or next_block.get('day_label', '')), ('Time', next_block.get('time_raw', ''))])}</article>"
@@ -1218,7 +1416,7 @@ def build_site(
 
     program_summary = _render_day_summary_cards(daily_program_summary_df, STATE["program_blocks"])
     program_content = (
-        f"{now_next_critical_public}"
+        f"{_wrap_dynamic_now_next(now_next_critical_public, include_owner=False)}"
         f"<section class='panel'><h2>Personal Schedule View</h2>{_render_program_table(pd.DataFrame(STATE['personal_program_blocks']))}</section>"
         f"<section class='panel'><h2>Operational Duties</h2>{operational_duties_html}</section>"
         f"<section class='panel'><h2>Operational Signals</h2>{operational_signals_html}</section>"
@@ -1263,7 +1461,7 @@ def build_site(
     }
 
     pages = {
-        filename: _site_shell(spec["title"], spec["subtitle"], filename, spec["content"], generated_at)
+        filename: _site_shell(spec["title"], spec["subtitle"], filename, spec["content"], generated_at, STATE["program_blocks"])
         for filename, spec in page_specs.items()
     }
 
@@ -1273,6 +1471,7 @@ def build_site(
         json.dumps(
             {
                 "generated_at": generated_at,
+                "program_blocks": STATE["program_blocks"],
                 "pages": page_specs,
             },
             indent=2,

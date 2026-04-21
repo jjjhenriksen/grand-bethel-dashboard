@@ -97,7 +97,29 @@ Operational note:
 
 - attendee patches affect family counts, meals alignment, rooming rows, and downstream displays
 
-### D. Add or remove competition entries
+### D. Add or remove synthetic respondents
+
+Use when:
+
+- a whole response is missing from the raw CSV export
+- you need a manual respondent without editing the source CSV
+
+Commands:
+
+```bash
+python3.12 src/main.py respondent add --response-id MANUAL001 --respondent-name "Jane Doe" --family-attendance "Jane Doe - Adult Sophie Doe - 14" --contact-phone "555-123-4567" --attending-grand-bethel yes
+python3.12 src/main.py respondent remove --response-id MANUAL001
+```
+
+Storage:
+
+- `config/respondent_patches.yaml`
+
+Operational note:
+
+- respondent patches create full synthetic response rows and flow through attendees, meals, excursions, validations, and family outputs
+
+### E. Add or remove competition entries
 
 Use when:
 
@@ -115,7 +137,7 @@ Storage:
 
 - `config/competition_patches.yaml`
 
-### E. Configure competition timing behavior
+### F. Configure competition timing behavior
 
 Use when:
 
@@ -135,7 +157,7 @@ Storage:
 
 - `config/schedule_map.yaml`
 
-### F. Force a specific competition schedule slot
+### G. Force a specific competition schedule slot
 
 Use when:
 
@@ -153,7 +175,7 @@ Storage:
 
 - `config/bethel_overrides.yaml`
 
-### G. Accept or deny excursions session-wide
+### H. Accept or deny excursions session-wide
 
 Use when:
 

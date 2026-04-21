@@ -19,3 +19,87 @@ patches:
   competition_type: performing_arts
   category_raw: Vocal Soloist
   response_id: R0007
+- action: add
+  participant_name: Aniah
+  competition_type: arts_and_crafts
+  category_raw: '2'
+  response_id: R0003
+  is_group_competition: 'false'
+- action: add
+  participant_name: Miley
+  competition_type: choir
+  category_raw: ''
+  response_id: R0002
+  is_group_competition: 'true'
+- action: add
+  participant_name: Jordan
+  competition_type: performing_arts
+  category_raw: Vocal or Instrumental Ensemble (This includes vocal duets)
+  response_id: R0004
+  is_group_competition: 'true'
+- action: add
+  participant_name: Lucia
+  competition_type: performing_arts
+  category_raw: Vocal or Instrumental Ensemble (This includes vocal duets)
+  response_id: R0003
+  is_group_competition: 'true'
+- action: add
+  participant_name: Zarah
+  competition_type: performing_arts
+  category_raw: Vocal or Instrumental Ensemble (This includes vocal duets)
+  response_id: R0003
+  is_group_competition: 'true'
+- action: add
+  participant_name: Lucia
+  competition_type: arts_and_crafts
+  category_raw: '2'
+  response_id: R0003
+  is_group_competition: 'false'
+- action: add
+  participant_name: Lucia
+  competition_type: librarians_report
+  category_raw: The Goddess of Spring
+  response_id: R0003
+  is_group_competition: 'false'
+- action: add
+  participant_name: Lucia
+  competition_type: librarians_report
+  category_raw: sleepless sleepover
+  response_id: R0003
+  is_group_competition: 'false'
+- action: add
+  participant_name: Lucia
+  competition_type: librarians_report
+  category_raw: Mother Mick
+  response_id: R0003
+  is_group_competition: 'false'
+- action: add
+  participant_name: Miley
+  competition_type: arts_and_crafts
+  category_raw: '2'
+  response_id: R0002
+  is_group_competition: 'false'
+- action: add
+  participant_name: Miley
+  competition_type: performing_arts
+  category_raw: Vocal Soloist
+  response_id: R0002
+  is_group_competition: 'false'
+- action: add
+  participant_name: Talya
+  competition_type: arts_and_crafts
+  category_raw: ''
+  response_id: R0007
+  is_group_competition: 'false'
+- action: add
+  participant_name: Talya
+  competition_type: performing_arts
+  category_raw: Instrumental (Any instrument, including piano)
+  response_id: R0007
+  is_group_competition: 'false'
+- action: add
+  participant_name: Zarah
+  competition_type: arts_and_crafts
+  category_raw: '3'
+  response_id: R0003
+  is_group_competition: 'false'
