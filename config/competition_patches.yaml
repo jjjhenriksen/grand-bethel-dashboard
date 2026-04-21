@@ -103,3 +103,216 @@ patches:
   category_raw: '3'
   response_id: R0003
   is_group_competition: 'false'
+- action: remove
+  participant_name: Miley
+  competition_type: performing_arts
+  category_raw: Ensemble sign?
+  response_id: R0002
+- action: remove
+  participant_name: Lucia
+  competition_type: performing_arts
+  category_raw: Instrumental (Any instrument, including piano)
+  response_id: R0003
+- action: remove
+  participant_name: Zarah
+  competition_type: performing_arts
+  category_raw: Instrumental (Any instrument, including piano)
+  response_id: R0003
+- action: remove
+  participant_name: Miley
+  competition_type: arts_and_crafts
+  category_raw: 'Category 1: Handcrafts: Fired Ceramic, Painted Plaster, Modeling
+    Clay, Paper Mache/Decoupage, Woodcarving, Jewelry Making, Metalwork, Glassworks,
+    Category 2: Painting and Drawing (Traditional): Oil and Acrylic, Watercolor, Pastels,
+    Pen/Pencil/Ink Sketches, Category 6: Paper Crafts: Scrapbook Page, Collage, Other,
+    Category 7: Digital Arts: Drawing and Painting, Mixed Media, 3D Modelling'
+  response_id: R0002
+- action: remove
+  participant_name: Lucia
+  competition_type: arts_and_crafts
+  category_raw: 2/7
+  response_id: R0003
+- action: remove
+  participant_name: Jordan
+  competition_type: arts_and_crafts
+  category_raw: 'Category 1: Handcrafts: Fired Ceramic, Painted Plaster, Modeling
+    Clay, Paper Mache/Decoupage, Woodcarving, Jewelry Making, Metalwork, Glassworks,
+    Category 2: Painting and Drawing (Traditional): Oil and Acrylic, Watercolor, Pastels,
+    Pen/Pencil/Ink Sketches, Category 3: Handiwork and Needlework: Knitting/Crochet,
+    Latchhook and Macrame, Needlepoint/Embroidery, Flower Arranging, Category 4: Photography:
+    Black and White Portrait, Black and White Landscape, Black and White Color Accents,
+    Color Portrait, Color Landscape'
+  response_id: R0004
+- action: remove
+  participant_name: Megan
+  competition_type: arts_and_crafts
+  category_raw: 'Category 1: Handcrafts: Fired Ceramic, Painted Plaster, Modeling
+    Clay, Paper Mache/Decoupage, Woodcarving, Jewelry Making, Metalwork, Glassworks,
+    Category 2: Painting and Drawing (Traditional): Oil and Acrylic, Watercolor, Pastels,
+    Pen/Pencil/Ink Sketches, Category 7: Digital Arts: Drawing and Painting, Mixed
+    Media, 3D Modelling'
+  response_id: R0005
+- action: remove
+  participant_name: Talya
+  competition_type: arts_and_crafts
+  category_raw: 'Category 2: Painting and Drawing (Traditional): Oil and Acrylic,
+    Watercolor, Pastels, Pen/Pencil/Ink Sketches, Category 7: Digital Arts: Drawing
+    and Painting, Mixed Media, 3D Modelling'
+  response_id: R0007
+- action: remove
+  participant_name: Hailey
+  competition_type: arts_and_crafts
+  category_raw: 'Category 2: Painting and Drawing (Traditional): Oil and Acrylic,
+    Watercolor, Pastels, Pen/Pencil/Ink Sketches'
+  response_id: R0008
+- action: remove
+  participant_name: Eliana
+  competition_type: performing_arts
+  category_raw: Instrumental (Any instrument, including piano)
+  response_id: R0007
+- action: remove
+  participant_name: Talya
+  competition_type: performing_arts
+  category_raw: Vocal Soloist
+  response_id: R0007
+- action: add
+  participant_name: Miley
+  competition_type: arts_and_crafts
+  category_raw: '2'
+  response_id: R0002
+  is_group_competition: 'false'
+- action: add
+  participant_name: Lucia
+  competition_type: arts_and_crafts
+  category_raw: '2'
+  response_id: R0003
+  is_group_competition: 'false'
+- action: add
+  participant_name: Talya
+  competition_type: arts_and_crafts
+  category_raw: '7'
+  response_id: R0007
+  is_group_competition: 'false'
+- action: remove
+  participant_name: Miley
+  competition_type: variety_show
+  category_raw: ''
+  response_id: R0002
+- action: remove
+  participant_name: Aniah
+  competition_type: variety_show
+  category_raw: ''
+  response_id: R0003
+- action: remove
+  participant_name: Lucia
+  competition_type: variety_show
+  category_raw: ''
+  response_id: R0003
+- action: remove
+  participant_name: Zarah
+  competition_type: variety_show
+  category_raw: ''
+  response_id: R0003
+- action: remove
+  participant_name: Jordan
+  competition_type: variety_show
+  category_raw: ''
+  response_id: R0004
+- action: remove
+  participant_name: Megan
+  competition_type: variety_show
+  category_raw: ''
+  response_id: R0005
+- action: remove
+  participant_name: Talya
+  competition_type: variety_show
+  category_raw: ''
+  response_id: R0007
+- action: remove
+  participant_name: Eliana
+  competition_type: variety_show
+  category_raw: ''
+  response_id: R0007
+- action: remove
+  participant_name: Hailey
+  competition_type: variety_show
+  category_raw: ''
+  response_id: R0008
+- action: remove
+  participant_name: Miley
+  competition_type: choir
+  category_raw: ''
+  response_id: R0002
+- action: remove
+  participant_name: Aniah
+  competition_type: choir
+  category_raw: ''
+  response_id: R0003
+- action: remove
+  participant_name: Lucia
+  competition_type: choir
+  category_raw: ''
+  response_id: R0003
+- action: remove
+  participant_name: Zarah
+  competition_type: choir
+  category_raw: ''
+  response_id: R0003
+- action: remove
+  participant_name: Jordan
+  competition_type: choir
+  category_raw: ''
+  response_id: R0004
+- action: remove
+  participant_name: Megan
+  competition_type: choir
+  category_raw: ''
+  response_id: R0005
+- action: remove
+  participant_name: Eliana
+  competition_type: choir
+  category_raw: ''
+  response_id: R0007
+- action: remove
+  participant_name: Talya
+  competition_type: choir
+  category_raw: ''
+  response_id: R0007
+- action: remove
+  participant_name: Hailey
+  competition_type: choir
+  category_raw: ''
+  response_id: R0008
+- action: remove
+  participant_name: Aniah
+  competition_type: arts_and_crafts
+  category_raw: '2'
+  response_id: R0003
+- action: remove
+  participant_name: Zarah
+  competition_type: arts_and_crafts
+  category_raw: '3'
+  response_id: R0003
+- action: remove
+  participant_name: Lucia
+  competition_type: librarians_report
+  category_raw: ''
+  response_id: R0003
+- action: add
+  participant_name: Miley
+  competition_type: choir
+  category_raw: ''
+  response_id: R0002
+  is_group_competition: 'true'
+- action: add
+  participant_name: Aniah
+  competition_type: arts_and_crafts
+  category_raw: '2'
+  response_id: R0003
+  is_group_competition: 'false'
+- action: add
+  participant_name: Zarah
+  competition_type: arts_and_crafts
+  category_raw: '3'
+  response_id: R0003
+  is_group_competition: 'false'
